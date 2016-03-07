@@ -1,0 +1,93 @@
+<?php
+
+namespace app\models;
+
+use Yii;
+
+/**
+ * This is the model class for table "users".
+ *
+ * @property integer $id_user
+ * @property string $email
+ * @property string $password
+ * @property string $fullname
+ * @property string $phone
+ * @property string $gender
+ * @property string $birthdate
+ * @property string $joindate
+ * @property string $agreement
+ * @property string $active
+ */
+class Users extends \yii\db\ActiveRecord
+{
+	
+	public $file;
+
+
+	
+    /**
+     * @inheritdoc
+     */
+    public static function tableName()
+    {
+        return 'users';
+    }
+	
+	
+
+    /**
+     * @inheritdoc
+     */
+    public function rules()
+    {
+        return [
+            [['email', 'password', 'fullname','agreement'], 'required'],
+            [['gender', 'active'], 'string'],
+            [['joindate'], 'safe'],
+			[['birthdate','birthmonth','birthyear'],'string'],
+            [['location'], 'string', 'max' => 100],
+            [['password'], 'string', 'max' => 300,'min' => 6],
+		    [['file'], 'file','extensions'=>'jpg, gif, png','maxSize' => 500000, ],
+            [['fullname'], 'string', 'max' => 50],
+            [['phone','chatid'], 'string', 'max' => 15],
+            [['email', 'phone','chatid','authKey'], 'unique']
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function attributeLabels()
+    {
+        return [
+            'id_user' => 'Id User',
+            'email' => 'Email',
+            'password' => 'Password',
+            'fullname' => 'Nama Lengkap',
+            'phone' => 'Nomor HandPhone',
+            'chatid' => 'Pin BBM',
+            'gender' => 'Jenis Kelamin',
+            'birthdate' => '',
+            'birthmonth' => '',
+            'birthyear' => '',
+            'joindate' => 'Tanggal Bergabung',
+            'agreement' => 'Syarat dan Ketentuan',
+            'file' => 'Upload Foto',
+            'active' => 'Active',
+            'location' => 'Lokasi',
+         
+        ];
+    }
+	
+public function beforeSave($insert) {
+    if(isset($this->password)) 
+		
+		 $this->password = bin2hex($this->password);
+		 $this->authKey = sha1($this->email);
+		 $this->joindate = date('Y-m-d H:i:s');
+		
+
+    return parent::beforeSave($insert);
+}
+
+}
